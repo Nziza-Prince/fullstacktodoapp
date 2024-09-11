@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components{
+    .hovered-card{
+        @apply transition-transform transform hover:scale-105 hover:shadow-lg;
+    }
+}
