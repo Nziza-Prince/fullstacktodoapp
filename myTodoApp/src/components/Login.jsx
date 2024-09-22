@@ -19,9 +19,12 @@ const [loading,setLoading] = useState(false);
               navigate("/home", { replace: true });
           } else {
               console.error("Token is undefined");
+              toast.error("Invalid credentials")
           }
       } catch (err) {
           console.error("Login failed", err);
+          toast.error("Invalid credentials")
+
       } finally {
           setLoading(false); // Stop loading spinner
       }
@@ -45,7 +48,7 @@ const [loading,setLoading] = useState(false);
              onChange={(e)=>setPassword(e.target.value)}
             required/>
         </div>
-        <button type="submit" className='bg-green-500 px-5 py-2 rounded-md text-white font-bold text-lg hover:bg-green-400 mt-5 w-[100%]'>Signin</button>
+        <button type="submit" disabled={loading} className='bg-green-500 px-5 py-2 rounded-md text-white font-bold text-center text-lg hover:bg-green-400 mt-5 w-[100%]'>{loading ? <div className='spinner'></div> : "Signin"}</button>
         <Link className='text-sm float-right mt-5 text-blue-600 underline' to="/register">Register now</Link>
      </form>
     </div>

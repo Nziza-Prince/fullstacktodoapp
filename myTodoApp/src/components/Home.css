@@ -76,5 +76,19 @@
   .loading-dots div:nth-child(3) {
     animation-delay: 0;
   }
+  .spinner {
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-left-color: #fff;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    animation: spin 1s linear infinite;
+}
   
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
   

@@ -5,10 +5,16 @@
     width: 24px;
     height: 24px;
     animation: spin 1s linear infinite;
+    align-items: center;
 }
   
   @keyframes spin {
     to {
       transform: rotate(360deg);
     }
+  }
+  button:disabled{
+       cursor: not-allowed;
+       --tw-bg-opacity: 1;
+       background-color: rgb(34 197 94 / var(--tw-bg-opacity))
   }

@@ -11,6 +11,11 @@ function Home() {
   const [task, setTask] = useState("");
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [addloading,setAddLoading] = useState(false)
+  const [completeLoadinng,setCompleteLoading] = useState(false)
+  const [updateLoadinng,setUpdateLoading] = useState(false)
+
+  const [deleteLoading,setDeleteLoading] = useState(false)
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
   const [error, setError] = useState(""); // State for error message
@@ -40,8 +45,10 @@ function Home() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (task.trim() === "") { // Check if the input is empty
-      setError("Please enter a task"); // Set error message
+    setAddLoading(true)
+    if (task.trim() === "") {
+      setError("Please enter a task");
+      setAddLoading(false); // Stop loading spinner when error occurs
       return;
     }
     setError(""); // Clear error message if input is not empty
@@ -54,15 +61,17 @@ function Home() {
       .then(res => {
         setTasks([...tasks, res.data]);
         setTask("");
+        setAddLoading(false)
       })
       .catch(error => {
+        setAddLoading(false)
         console.error("couldn't create the task", error);
         toast.danger("couldnt create the task")
-        
       });
     };
 
   const handleDelete = (id) => {
+    setDeleteLoading(true)
     axios.delete(`${backendUrl}/${id}`, {
       headers: {
         Authorization: `Bearer ${token}` // Include JWT in headers
@@ -70,14 +79,19 @@ function Home() {
     })
     .then(() => {
         setTasks(tasks.filter(task => task._id !== id));
+        setDeleteLoading(false)
       })
       .catch(error => {
         console.error("an error occurred while deleting", error);
         toast.danger("couldnt create the task")
+        setDeleteLoading(false)
       });
   };
   
   const handleComplete = (id) => {
+    
+    setCompleteLoading(true)
+
     const task = tasks.find(task => task._id === id);
     axios.put(`${backendUrl}/${id}`, { completed: !task.completed }, {
       headers: {
@@ -86,10 +100,12 @@ function Home() {
     })
       .then(response => {
         setTasks(tasks.map(task => task._id === id ? response.data : task));
+        setCompleteLoading(false)
       })
       .catch(error => {
         console.error("There was an error updating the task!", error);
         toast.danger("couldnt create the task")
+        setCompleteLoading(false)
       });
     };
     
@@ -97,20 +113,25 @@ function Home() {
       setSelectedTask(task);
       setModalIsOpen(true);
     };
-
-  const handleSaveEdit = (editedTask) => {
-    axios.put(`${backendUrl}/${editedTask._id}`, editedTask, {
-      headers: {
-        Authorization: `Bearer ${token}` // Include JWT in headers
-      }
-    })
-      .then(response => {
-        setTasks(tasks.map(task => task._id === editedTask._id ? response.data : task));
+  
+    const handleSaveEdit = (editedTask) => {
+      setUpdateLoading(true);
+      axios.put(`${backendUrl}/${editedTask._id}`, editedTask, {
+        headers: {
+          Authorization: `Bearer ${token}` // Include JWT in headers
+        }
       })
-      .catch(error => {
-        console.error("There was an error updating the task!", error);
-        toast.danger("couldnt create the task")
-      });
+        .then(response => {
+          setTasks(tasks.map(task => task._id === editedTask._id ? response.data : task));
+          setUpdateLoading(false);
+          setModalIsOpen(false); // Close modal after successful update
+          toast.success("Task updated successfully");
+        })
+        .catch(error => {
+          console.error("Error updating the task", error);
+          toast.error("Failed to update the task");
+          setUpdateLoading(false);
+        });
     };
     
   const navigate = useNavigate
@@ -136,20 +157,21 @@ if (loading) {
 
   return (
     <div className='p-10'>
-      <h1 className='mb-10 text-5xl font-bold'>This Week's ToDoList</h1>
+      <h1 className='mb-10 text-5xl font-bold'>Today's Plan</h1>
       <form action="" className='mb-10' onSubmit={handleSubmit}>
         <div className='flex flex-col'>
       {error && <p className='text-left ml-2 text-red-500 mt-2 font-bold text-2xl'>{error}</p>} {/* Render error message */}
-          <label htmlFor="Task" className='text-left ml-3 font-bold'>Add Todo</label>
+          <label htmlFor="Task" className='text-left ml-3 font-bold'></label>
           <input
             onChange={(e) => setTask(e.target.value)}
             type="text"
             value={task}
             className='font-bold text-lg h-10 indent-2 border-2 border-collapse rounded-md focus:outline-double outline-blue-400'
+            placeholder='add task ....'
           />
         </div>
         <div className='flex justify-start'>
-          <button className='bg-blue-600 text-white p-2 mt-3 font-bold rounded-md hover:bg-blue-500'>Add</button>
+          <button className='bg-blue-600 text-white p-2 mt-3 font-bold rounded-md hover:bg-blue-500'>{addloading ? <div className='spinner'></div>:"Add"}</button>
         </div>
       </form>
       <div className="text-right  flex  mb-10 justify-between">
@@ -172,6 +194,7 @@ if (loading) {
                 onClick={() => handleDelete(task._id)}
                 className='font-bold text-xl hover:cursor-pointer'
               />
+            
               <MdModeEditOutline onClick={() => handleEdit(task)} className='font-bold text-xl hover:cursor-pointer'/>
             </div>
           </div>
@@ -182,9 +205,15 @@ if (loading) {
         onRequestClose={() => setModalIsOpen(false)}
         task={selectedTask}
         onSave={handleSaveEdit}
+
       />
+      {deleteLoading ? <h1 className="mt-3">Deleting Task...</h1> : ""}
+      {completeLoadinng ? <h1 className="mt-3">Completing Task...</h1> : ""}
+      {updateLoadinng ? <h1 className="mt-3">Updating Task...</h1> : ""}
+
+
       <hr className='mt-10 '/>
-      <p className='font-bold mt-3'>copyright Nziza Prince 2024</p>
+      <p className='font-bold mt-3'>© Nziza Prince 2024</p>
     </div>
   );
 }
