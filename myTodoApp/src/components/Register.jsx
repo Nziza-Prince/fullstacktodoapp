@@ -22,7 +22,7 @@ const Register = () => {
         })
         .catch(err=>{
            console.error(err)
-            toast.danger({message:err.message})
+            toast.error({message:err.message})
             setRegisterLoading(false)
         }
         )
