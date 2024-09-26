@@ -66,7 +66,7 @@ function Home() {
       .catch(error => {
         setAddLoading(false)
         console.error("couldn't create the task", error);
-        toast.danger("couldnt create the task")
+        toast.error("couldnt create the task")
       });
     };
 
@@ -83,7 +83,7 @@ function Home() {
       })
       .catch(error => {
         console.error("an error occurred while deleting", error);
-        toast.danger("couldnt create the task")
+        toast.error("couldnt create the task")
         setDeleteLoading(false)
       });
   };
@@ -120,7 +120,7 @@ function Home() {
       })
       .catch(error => {
         console.error("There was an error updating the task!", error);
-        toast.danger("couldnt create the task")
+        toast.error("couldnt create the task")
         setCompleteLoading(false)
       });
     };
