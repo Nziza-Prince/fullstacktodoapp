@@ -8,7 +8,7 @@ const register = require("./auth/register.js");
 const login = require("./auth/login.js");
 const todos = require("./apis.js"); // Import the todos routes
 
-const port = process.env.PORT || 3000;
+const port =process.env.PORT || 3000;
 const mongoUrl = process.env.MONGO_URI;
 
 // CORS middleware configuration
