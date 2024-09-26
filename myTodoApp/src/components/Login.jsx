@@ -7,12 +7,13 @@ const Login = () => {
 const [loading,setLoading] = useState(false);
     const [email,setEmail]=useState("")
     const [password,setPassword]=useState("")
+    const backendUrl = import.meta.env.VITE_LOGIN_URL
      const navigate = useNavigate()
      const handleSubmit = async (e) => {
       e.preventDefault();
       setLoading(true); // Start loading spinner
      try {
-          const response = await axios.post("http://localhost:3000/login", { email, password });
+          const response = await axios.post(backendUrl, { email, password });
           const token = response.data.token;
           if (token) {
               localStorage.setItem("token", token); // Store token in localStorage

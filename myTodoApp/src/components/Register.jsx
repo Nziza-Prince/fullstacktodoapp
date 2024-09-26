@@ -9,10 +9,11 @@ const Register = () => {
     const [password,setPassword]=useState("")
     const [registerLoading,setRegisterLoading] = useState(false)
      const navigate = useNavigate()
+     const backendUrl = import.meta.env.VITE_REGISTER_URL
     const handleSubmit = async(e)=>{
         setRegisterLoading(true)
         e.preventDefault()
-        axios.post("http://localhost:3000/register",{userName,email,password})
+        axios.post(backendUrl,{userName,email,password})
         .then(result=>{
             navigate("/",{replace:true})
             console.log(result)

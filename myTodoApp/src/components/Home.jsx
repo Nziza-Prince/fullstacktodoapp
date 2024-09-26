@@ -87,6 +87,22 @@ function Home() {
         setDeleteLoading(false)
       });
   };
+
+  const handleClearCompleted = () => {
+    axios.delete(`${backendUrl}/clear-completed/todos`, {
+      headers: {
+        Authorization: `Bearer ${token}` // Include JWT in headers
+      }
+    })
+      .then(() => {
+        setTasks(tasks.filter(task => !task.completed));
+        toast.success("Completed tasks cleared successfully");
+      })
+      .catch(error => {
+        console.error("Error clearing completed tasks", error);
+        toast.error("Failed to clear completed tasks");
+      });
+  };
   
   const handleComplete = (id) => {
     
@@ -134,6 +150,7 @@ function Home() {
         });
     };
     
+
   const navigate = useNavigate
 
     const handleLogout = ()=>{
@@ -178,6 +195,7 @@ if (loading) {
         <p className='font-bold text-2xl'>Incomplete Tasks: {incompleteTasksCount}</p>
         <p className='font-bold text-2xl'>Complete Tasks: {completeTasksCount}</p>
         <p className='font-bold text-2xl'>Total Tasks: {totalTasks}</p>
+        <button className='bg-red-500 px-5 py-2 text-white text-xl font-bold rounded-md ml-20' onClick={handleClearCompleted}>Clear Complete</button>
       <button className='bg-red-500 px-5 py-2 text-white text-xl font-bold rounded-md ml-20' onClick={handleLogout}>Logout</button>
    </div>
       {tasks.length === 0 ?
