@@ -19,12 +19,11 @@ function Home() {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
   const [error, setError] = useState(""); // State for error message
-
   const token = localStorage.getItem('token'); // Retrieve JWT from localStorage
    
-    const decodedToken = jwtDecode(token);
-    const userId = decodedToken.userId; // Extract userId from token
-    const backendUrl = `${import.meta.env.VITE_UBASE_URL}/${userId}/todos`;
+   const decodedToken = jwtDecode(token);
+   const userId = decodedToken.userId; // Extract userId from token
+   const backendUrl = `${import.meta.env.VITE_UBASE_URL}/${userId}/todos`;
    
 
 
