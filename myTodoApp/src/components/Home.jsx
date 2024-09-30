@@ -242,18 +242,18 @@ function Home() {
           Complete Tasks: {completeTasksCount}
         </p>
         <p className="font-bold text-2xl">Total Tasks: {totalTasks}</p>
-        <button
+        {/* <button
           className="bg-red-500 px-5 py-2 text-white text-xl font-bold rounded-md ml-20"
           onClick={handleClearCompleted}
         >
           Clear Complete
-        </button>
-        <button
+        </button> */}
+        {/* <button
           className="bg-red-500 px-5 py-2 text-white text-xl font-bold rounded-md ml-20"
           onClick={handleLogout}
         >
           Logout
-        </button>
+        </button> */}
       </div>
       {tasks.length === 0 ? (
         <p className="font-bold text-lg">No Tasks to display</p>
