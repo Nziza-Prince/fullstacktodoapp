@@ -60,7 +60,7 @@
     width: 8px;
     height: 8px;
     margin: 0 4px;
-    background: rgb(34, 34, 34);
+    background: rgb(252, 252, 252);
     border-radius: 50%;
     animation: wave 1.2s infinite ease-in-out;
   }
@@ -88,6 +88,12 @@
   @keyframes spin {
     to {
       transform: rotate(360deg);
+    }
+  }
+  #button{
+    &:disabled{
+      cursor: not-allowed;
+      background-color: #4793f6 ;
     }
   }
 

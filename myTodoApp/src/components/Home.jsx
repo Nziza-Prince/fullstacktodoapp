@@ -106,7 +106,7 @@ function Home() {
       })
       .catch((error) => {
         console.error("an error occurred while deleting", error);
-        toast.error("couldnt create the task");
+        toast.error("couldnt delete the task! Try refreshing the page");
         setDeleteLoading(false);
       });
   };
@@ -120,7 +120,6 @@ function Home() {
       })
       .then(() => {
         setTasks(tasks.filter((task) => !task.completed));
-        toast.success("Completed tasks cleared successfully");
       })
       .catch((error) => {
         console.error("Error clearing completed tasks", error);
@@ -145,10 +144,11 @@ function Home() {
       .then((response) => {
         setTasks(tasks.map((task) => (task._id === id ? response.data : task)));
         setCompleteLoading(false);
+      
       })
       .catch((error) => {
         console.error("There was an error updating the task!", error);
-        toast.error("couldnt create the task");
+        toast.error("couldnt update the task! Try refreshing the page");
         setCompleteLoading(false);
       });
   };
@@ -178,7 +178,7 @@ function Home() {
       })
       .catch((error) => {
         console.error("Error updating the task", error);
-        toast.error("Failed to update the task");
+        toast.error("Failed to update the task! Try to refresh the page");
         setUpdateLoading(false);
       });
   };
@@ -229,7 +229,7 @@ function Home() {
           />
         </div>
         <div className="flex justify-start">
-          <button className="bg-blue-600 text-white p-2 mt-3 font-bold rounded-md hover:bg-blue-500">
+          <button className="bg-blue-600 text-white p-2 mt-3 font-bold rounded-md hover:bg-blue-500" id="button" disabled={addloading}>
             {addloading ? <div className="spinner"></div> : "Add"}
           </button>
         </div>
