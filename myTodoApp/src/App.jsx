@@ -4,6 +4,7 @@ import Login from './components/Login.jsx'
 import Home from './components/Home.jsx'
 import { Routes,Route,BrowserRouter } from 'react-router-dom'
 import Logout from './components/Logout.jsx'
+import Notification from './components/Notification.jsx'
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
       <Route path="/logout" element={<Logout/>}/>
 
     </Routes>
+    <Notification/>
    </BrowserRouter>
     </>
   )
