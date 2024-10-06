@@ -250,7 +250,7 @@ function Home() {
           Clear Complete
         </button>
         <button
-          className="bg-red-500 px-5 py-2 text-white text-xl font-bold rounded-md ml-20"
+          className="bg-red-500 px-5 text-white text-xl font-bold rounded-md ml-20"
           onClick={handleLogout}
         >
           Logout
