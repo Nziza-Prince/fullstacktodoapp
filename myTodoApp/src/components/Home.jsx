@@ -16,6 +16,7 @@ function Home() {
   const [addloading, setAddLoading] = useState(false);
   const [completeLoadinng, setCompleteLoading] = useState(false);
   const [updateLoadinng, setUpdateLoading] = useState(false);
+  const [clearLoadinng, setClearLoading] = useState(false);
   const [dark, setDark] = useState(true);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [modalIsOpen, setModalIsOpen] = useState(false);
@@ -56,7 +57,7 @@ function Home() {
         setLoading(false);
       })
       .catch((error) => {
-        console.error("couldn't fetch the tasks", error);
+        console.error("Couldn't fetch the tasks", error);
       });
   }, [backendUrl, token]);
 
@@ -106,25 +107,37 @@ function Home() {
       })
       .catch((error) => {
         console.error("an error occurred while deleting", error);
-        toast.error("couldnt delete the task! Try refreshing the page");
+        toast.error("Refresh the page and try again!");
         setDeleteLoading(false);
       });
   };
 
   const handleClearCompleted = () => {
-    // axios
-    //   .delete(`${backendUrl}/clear-completed/todos`, {
-    //     headers: {
-    //       Authorization: `Bearer ${token}`, // Include JWT in headers
-    //     },
-    //   })
-    //   .then(() => {
-    //     setTasks(tasks.filter((task) => !task.completed));
-    //   })
-    //   .catch((error) => {
-    //     console.error("Error clearing completed tasks", error);
-    //   });
-      toast.error("Under Maintainance");
+     const completedTasks = tasks.filter((task)=>task.completed)
+
+     if(completedTasks.length === 0){
+      toast.info("You have no completed tasks")
+     }
+else{
+
+  setClearLoading(true)
+  axios
+    .delete(`${backendUrl}/clear-completed`, {
+      headers: {
+        Authorization: `Bearer ${token}`, // Include JWT in headers
+      },
+    })
+    .then(() => {
+      setTasks(tasks.filter((task) => !task.completed));
+      toast.success("Cleared tasks Successfully")
+      setClearLoading(false)
+    })
+    .catch((error) => {
+      console.error("Error clearing completed tasks", error);
+      toast.error("Refresh the page and try again");
+      setClearLoading(false)
+    });
+}
   };
 
   const handleComplete = (id) => {
@@ -188,7 +201,7 @@ function Home() {
   const handleLogout = () => {
     // localStorage.removeItem("token");
     // navigate("/login");
-    toast.error("Under Maintainance")
+    toast.error("Coming Soon!!!")
   };
 
   if (loading) {
@@ -300,6 +313,7 @@ function Home() {
       {deleteLoading ? <h1 className="mt-3">Deleting Task...</h1> : ""}
       {completeLoadinng ? <h1 className="mt-3">Completing Task...</h1> : ""}
       {updateLoadinng ? <h1 className="mt-3">Updating Task...</h1> : ""}
+      {clearLoadinng ? <h1 className="mt-3">Clearing Tasks...</h1>:""}
 
       <hr className="mt-10 " />
       <p className="font-bold mt-3">© Nziza Prince 2024</p>
