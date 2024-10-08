@@ -84,6 +84,27 @@ router.put("/:userId/todos/:todoId", async (req, res) => {
   }
 });
 
+// DELETE all completed todos for a specific user
+router.delete("/:userId/todos/clear-completed", async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Find the user and remove all completed todos
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { $pull: { todos: { completed: true } } }, // Remove completed tasks
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({ message: "Completed tasks cleared successfully", todos: updatedUser.todos });
+  } catch (err) {
+    res.status(500).json({ message: "Something went wrong", error: err.message });
+  }
+});
 // DELETE a specific todo by ID for a specific user
 router.delete("/:userId/todos/:todoId", async (req, res) => {
   try {
@@ -104,27 +125,6 @@ router.delete("/:userId/todos/:todoId", async (req, res) => {
   }
 });
 
-// DELETE all completed todos for a specific user
-router.delete("/:userId/todos/clear-completed/todos", async (req, res) => {
-  try {
-    const { userId } = req.params;
-
-    // Find the user and remove all completed todos
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      { $pull: { todos: { completed: true } } }, // Remove completed tasks
-      { new: true } // Return the updated document
-    );
-
-    if (!updatedUser) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    res.status(200).json({ message: "Completed tasks cleared successfully", todos: updatedUser.todos });
-  } catch (err) {
-    res.status(500).json({ message: "Something went wrong", error: err.message });
-  }
-});
 
  // GET all incomplete todos for a specific user
 router.get("/:userId/todos/status/incomplete", async (req, res) => {
