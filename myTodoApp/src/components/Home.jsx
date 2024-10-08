@@ -113,58 +113,59 @@ function Home() {
   };
 
   const handleClearCompleted = () => {
-     const completedTasks = tasks.filter((task)=>task.completed)
+//      const completedTasks = tasks.filter((task)=>task.completed)
 
-     if(completedTasks.length === 0){
-      toast.info("You have no completed tasks")
-     }
-else{
+//      if(completedTasks.length === 0){
+//       toast.info("You have no completed tasks")
+//      }
+// else{
 
-  setClearLoading(true)
-  axios
-    .delete(`${backendUrl}/clear-completed`, {
-      headers: {
-        Authorization: `Bearer ${token}`, // Include JWT in headers
-      },
-    })
-    .then(() => {
-      setTasks(tasks.filter((task) => !task.completed));
-      toast.success("Cleared tasks Successfully")
-      setClearLoading(false)
-    })
-    .catch((error) => {
-      console.error("Error clearing completed tasks", error);
-      toast.error("Refresh the page and try again");
-      setClearLoading(false)
-    });
-}
+//   setClearLoading(true)
+//   axios
+//     .delete(`${backendUrl}/clear-completed`, {
+//       headers: {
+//         Authorization: `Bearer ${token}`, // Include JWT in headers
+//       },
+//     })
+//     .then(() => {
+//       setTasks(tasks.filter((task) => !task.completed));
+//       toast.success("Cleared tasks Successfully")
+//       setClearLoading(false)
+//     })
+//     .catch((error) => {
+//       console.error("Error clearing completed tasks", error);
+//       toast.error("Refresh the page and try again");
+//       setClearLoading(false)
+//     });
+// }
+toast.info("Coming Soon!!!")
   };
 
   const handleComplete = (id) => {
-    // setCompleteLoading(true);
+    setCompleteLoading(true);
 
-    // const task = tasks.find((task) => task._id === id);
-    // axios
-    //   .put(
-    //     `${backendUrl}/${id}`,
-    //     { completed: !task.completed },
-    //     {
-    //       headers: {
-    //         Authorization: `Bearer ${token}`, // Include JWT in headers
-    //       },
-    //     }
-    //   )
-    //   .then((response) => {
-    //     setTasks(tasks.map((task) => (task._id === id ? response.data : task)));
-    //     setCompleteLoading(false);
+    const task = tasks.find((task) => task._id === id);
+    axios
+      .put(
+        `${backendUrl}/${id}`,
+        { completed: !task.completed },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Include JWT in headers
+          },
+        }
+      )
+      .then((response) => {
+        setTasks(tasks.map((task) => (task._id === id ? response.data : task)));
+        setCompleteLoading(false);
       
-    //   })
-    //   .catch((error) => {
-    //     console.error("There was an error updating the task!", error);
-    //     toast.error("couldnt update the task! Try refreshing the page");
-    //     setCompleteLoading(false);
-    //   });
-    toast.info("Coming Soon !!!!")
+      })
+      .catch((error) => {
+        console.error("There was an error updating the task!", error);
+        toast.error("couldnt update the task! Try refreshing the page");
+        setCompleteLoading(false);
+      });
+    
   };
 
   const handleEdit = (task) => {
