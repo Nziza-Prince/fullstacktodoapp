@@ -30,7 +30,7 @@ const Register = () => {
   return (
     <div className='flex justify-center align-middle p-20'>
      <form action="" onSubmit={handleSubmit} className='border-2 inline-block justify-center align-middle p-10 bg-white'>
-        <h1 className=' font-extrabold text-center text-5xl mb-10'>Signup</h1>
+        <h1 className=' font-extrabold text-center text-5xl mb-10'>Sign Up</h1>
         <div className='flex flex-col mb-5'>
             <label htmlFor="name" className='font-bold ml-1 mb-2 text-lg text-left'>Name</label>
             <input className='border-2 w-[300px] border-gray-300 h-10 rounded-md focus:outline-none indent-2 text-gray-600 text-md font-bold' type="text" name='name'
