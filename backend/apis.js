@@ -106,24 +106,24 @@ router.delete("/:userId/todos/clear-completed", async (req, res) => {
   }
 });
 // DELETE a specific todo by ID for a specific user
-router.delete("/:userId/todos/:todoId", async (req, res) => {
-  try {
-    const user = await User.findById(req.params.userId);
-    if (!user) {
-      return res.status(404).send("User not found");
-    }
-    const todo = user.todos.id(req.params.todoId);
-    if (!todo) {
-      return res.status(404).send("Todo not found");
-    }
-    user.todos.pull(todo); // Remove the todo from the array
-    await user.save();
-    res.status(200).send(`Removed ${todo.title} successfully`);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Something went wrong", error: err.message });
-  }
-});
+// router.delete("/:userId/todos/:todoId", async (req, res) => {
+//   try {
+//     const user = await User.findById(req.params.userId);
+//     if (!user) {
+//       return res.status(404).send("User not found");
+//     }
+//     const todo = user.todos.id(req.params.todoId);
+//     if (!todo) {
+//       return res.status(404).send("Todo not found");
+//     }
+//     user.todos.pull(todo); // Remove the todo from the array
+//     await user.save();
+//     res.status(200).send(`Removed ${todo.title} successfully`);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ message: "Something went wrong", error: err.message });
+//   }
+// });
 
 
  // GET all incomplete todos for a specific user
