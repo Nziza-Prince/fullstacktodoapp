@@ -141,29 +141,30 @@ else{
   };
 
   const handleComplete = (id) => {
-    setCompleteLoading(true);
+    // setCompleteLoading(true);
 
-    const task = tasks.find((task) => task._id === id);
-    axios
-      .put(
-        `${backendUrl}/${id}`,
-        { completed: !task.completed },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`, // Include JWT in headers
-          },
-        }
-      )
-      .then((response) => {
-        setTasks(tasks.map((task) => (task._id === id ? response.data : task)));
-        setCompleteLoading(false);
+    // const task = tasks.find((task) => task._id === id);
+    // axios
+    //   .put(
+    //     `${backendUrl}/${id}`,
+    //     { completed: !task.completed },
+    //     {
+    //       headers: {
+    //         Authorization: `Bearer ${token}`, // Include JWT in headers
+    //       },
+    //     }
+    //   )
+    //   .then((response) => {
+    //     setTasks(tasks.map((task) => (task._id === id ? response.data : task)));
+    //     setCompleteLoading(false);
       
-      })
-      .catch((error) => {
-        console.error("There was an error updating the task!", error);
-        toast.error("couldnt update the task! Try refreshing the page");
-        setCompleteLoading(false);
-      });
+    //   })
+    //   .catch((error) => {
+    //     console.error("There was an error updating the task!", error);
+    //     toast.error("couldnt update the task! Try refreshing the page");
+    //     setCompleteLoading(false);
+    //   });
+    toast.info("Coming Soon !!!!")
   };
 
   const handleEdit = (task) => {
@@ -201,7 +202,7 @@ else{
   const handleLogout = () => {
     // localStorage.removeItem("token");
     // navigate("/login");
-    toast.error("Coming Soon!!!")
+    toast.info("Coming Soon!!!")
   };
 
   if (loading) {
