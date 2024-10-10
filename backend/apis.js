@@ -85,7 +85,7 @@ router.put("/:userId/todos/:todoId", async (req, res) => {
 });
 
 // DELETE all completed todos for a specific user
-router.delete("/:userId/todos/clear-completed", async (req, res) => {
+router.delete("/:userId/todos/status/completed", async (req, res) => {
   try {
     const { userId } = req.params;
 
@@ -139,6 +139,19 @@ router.get("/:userId/todos/status/incomplete", async (req, res) => {
     res.status(500).send("Couldn't fetch incomplete todos");
   }
 });
+
+router.get("/:userId",async(req,res)=>{
+  try{
+    const user = await User.findById(req.params.userId);
+    if(!user){
+      return res.status(404).send("User not found")
+    
+    }
+    res.send(user.userName)
+  } catch (err) {
+    res.status(500).send("Couldn't get the user");
+  }
+})
 
 // GET all complete todos for a specific user
 router.get("/:userId/todos/status/complete", async (req, res) => {
