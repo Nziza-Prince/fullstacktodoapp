@@ -1,4 +1,4 @@
-import { useEffect, useState, useNavigate } from "react";
+import { useEffect, useState, useNavigate, useContext } from "react";
 import { FaDeleteLeft } from "react-icons/fa6";
 import { IoMdCheckmark } from "react-icons/io";
 import axios from "axios";
@@ -9,6 +9,8 @@ import "./Home.css";
 import { toast } from "react-toastify";
 import { FiSun } from "react-icons/fi";
 import { FiMoon } from "react-icons/fi";
+import { ThemeContext } from "../store/ThemeContext";
+import User from "./User";
 function Home() {
   const [task, setTask] = useState("");
   const [tasks, setTasks] = useState([]);
@@ -23,27 +25,23 @@ function Home() {
   const [selectedTask, setSelectedTask] = useState(null);
   const [error, setError] = useState(""); // State for error message
   const token = localStorage.getItem("token"); // Retrieve JWT from localStorage
-
+  const {isDark,toggleTheme} = useContext(ThemeContext)
   const decodedToken = jwtDecode(token);
   const userId = decodedToken.userId; // Extract userId from token
   const backendUrl = `${import.meta.env.VITE_UBASE_URL}/${userId}/todos`;
 
   useEffect(() => {
     if (window.matchMedia("(prefers-color-schema:dark)").matches) {
-      setDark(true);
+      toggleTheme();
     }
   }, []);
   useEffect(() => {
-    if (dark) {
+    if (isDark) {
       document.documentElement.classList.add("dark");
     } else {
       document.documentElement.classList.remove("dark");
     }
-  }, [dark]);
-
-  const handleTheme = () => {
-      setDark(!dark);
-  };
+  }, [isDark]);
 
   useEffect(() => {
     axios
@@ -222,10 +220,15 @@ toast.info("Coming Soon!!!")
 
   return (
     <div className="p-10 dark:text-white">
-      <div className="flex text-center justify-center gap-40">
-      <h1 className="mb-10 text-5xl font-bold ">Today's Plan</h1>
-      {dark ? <FiSun className="mt-2 ml-10 cursor-pointer text-2xl" onClick={()=>setDark(false)}/> : <FiMoon className="mt-2 ml-10 cursor-pointer text-2xl" onClick={()=>setDark(true)}/>}
+      <div className="text-center flex justify-center gap-5">
+       <h1 className="mb-10 text-5xl font-bold text-center">Welcome</h1>
+      <User/>
       </div>
+      <div className="flex text-center justify-center">
+
+      <h1 className="mb-10 text-5xl font-bold ">Today's Plan</h1>
+      {isDark ? <FiSun className="mt-5 ml-10 cursor-pointer text-2xl" onClick={toggleTheme}/> : <FiMoon className="mt-3 ml-10 cursor-pointer text-2xl" onClick={toggleTheme}/>}
+    </div>
        
       <form action="" className="mb-10" onSubmit={handleSubmit}>
         <div className="flex flex-col">
