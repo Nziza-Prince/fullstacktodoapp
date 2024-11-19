@@ -26,15 +26,18 @@ function Home() {
   const [error, setError] = useState(""); // State for error message
   const token = localStorage.getItem("token"); // Retrieve JWT from localStorage
   const {isDark,toggleTheme} = useContext(ThemeContext)
-  const decodedToken = jwtDecode(token);
-  const userId = decodedToken.userId; // Extract userId from token
-  const backendUrl = `${import.meta.env.VITE_UBASE_URL}/${userId}/todos`;
+  const decodedToken = token ? jwtDecode(token) : null
+  const userId = decodedToken?.userId; // Extract userId from token
+  const backendUrl = `${import.meta.env.VITE_UBASE_URL}/${userId}/todos`; // Default URL for development
 
-  useEffect(() => {
-    if (window.matchMedia("(prefers-color-schema:dark)").matches) {
-      toggleTheme();
-    }
-  }, []);
+  // const navigate = useNavigate()
+
+
+    useEffect(() => {
+      if (window.matchMedia("(prefers-color-schema:dark)").matches) {
+        toggleTheme();
+      }
+    }, []);
   useEffect(() => {
     if (isDark) {
       document.documentElement.classList.add("dark");
@@ -45,9 +48,9 @@ function Home() {
 
   useEffect(() => {
     axios
-      .get(`${backendUrl}`, {
-        headers: {
-          Authorization: `Bearer ${token}`, // Include JWT in headers
+    .get(`${backendUrl}`, {
+      headers: {
+          Authorization: `Bearer ${token}`,
         },
       })
       .then((res) => {
@@ -55,9 +58,12 @@ function Home() {
         setLoading(false);
       })
       .catch((error) => {
-        console.error("Couldn't fetch the tasks", error);
+        setLoading(false);
+        setError("Failed to fetch tasks. Please check your connection or try again.");
+        console.error("Couldn't fetch the tasks", error.response || error.message);
       });
-  }, [backendUrl, token]);
+    }, [backendUrl, token]);
+  
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -68,7 +74,7 @@ function Home() {
       return;
     }
     setError(""); // Clear error message if input is not empty
-
+    
     axios
       .post(
         `${backendUrl}`,
@@ -90,17 +96,17 @@ function Home() {
         toast.error("couldnt create the task");
       });
   };
-
+  
   const handleDelete = (id) => {
     setDeleteLoading(true);
     axios
-      .delete(`${backendUrl}/${id}`, {
+    .delete(`${backendUrl}/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`, // Include JWT in headers
         },
       })
       .then(() => {
-        setTasks(tasks.filter((task) => task._id !== id));
+        setTasks(tasks.filter((task) => task.id !== id));
         setDeleteLoading(false);
       })
       .catch((error) => {
@@ -114,39 +120,39 @@ function Home() {
 //      const completedTasks = tasks.filter((task)=>task.completed)
 
 //      if(completedTasks.length === 0){
-//       toast.info("You have no completed tasks")
-//      }
-// else{
-
-//   setClearLoading(true)
-//   axios
-//     .delete(`${backendUrl}/clear-completed`, {
-//       headers: {
-//         Authorization: `Bearer ${token}`, // Include JWT in headers
-//       },
-//     })
-//     .then(() => {
-//       setTasks(tasks.filter((task) => !task.completed));
-//       toast.success("Cleared tasks Successfully")
-//       setClearLoading(false)
-//     })
-//     .catch((error) => {
-//       console.error("Error clearing completed tasks", error);
-//       toast.error("Refresh the page and try again");
-//       setClearLoading(false)
-//     });
-// }
-toast.info("Coming Soon!!!")
-  };
-
-  const handleComplete = (id) => {
-    setCompleteLoading(true);
-
-    const task = tasks.find((task) => task._id === id);
+  //       toast.info("You have no completed tasks")
+  //      }
+  // else{
+    
+  //   setClearLoading(true)
+  //   axios
+  //     .delete(`${backendUrl}/clear-completed`, {
+    //       headers: {
+      //         Authorization: `Bearer ${token}`, // Include JWT in headers
+      //       },
+      //     })
+      //     .then(() => {
+        //       setTasks(tasks.filter((task) => !task.completed));
+        //       toast.success("Cleared tasks Successfully")
+        //       setClearLoading(false)
+        //     })
+        //     .catch((error) => {
+          //       console.error("Error clearing completed tasks", error);
+          //       toast.error("Refresh the page and try again");
+          //       setClearLoading(false)
+          //     });
+          // }
+          toast.info("Coming Soon!!!")
+        };
+        
+        const handleComplete = (id) => {
+          setCompleteLoading(true);
+          
+    const task = tasks.find((task) => task.id === id);
     axios
       .put(
         `${backendUrl}/${id}`,
-        { completed: !task.completed },
+        { completed: !task.completed},
         {
           headers: {
             Authorization: `Bearer ${token}`, // Include JWT in headers
@@ -154,7 +160,7 @@ toast.info("Coming Soon!!!")
         }
       )
       .then((response) => {
-        setTasks(tasks.map((task) => (task._id === id ? response.data : task)));
+        setTasks(tasks.map((task) => (task.id === id ? response.data : task)));
         setCompleteLoading(false);
       
       })
@@ -164,17 +170,17 @@ toast.info("Coming Soon!!!")
         setCompleteLoading(false);
       });
     
+    };
+    
+    const handleEdit = (task) => {
+      setSelectedTask(task);
+      setModalIsOpen(true);
   };
-
-  const handleEdit = (task) => {
-    setSelectedTask(task);
-    setModalIsOpen(true);
-  };
-
+  
   const handleSaveEdit = (editedTask) => {
     setUpdateLoading(true);
     axios
-      .put(`${backendUrl}/${editedTask._id}`, editedTask, {
+    .put(`${backendUrl}/${editedTask.id}`, editedTask, {
         headers: {
           Authorization: `Bearer ${token}`, // Include JWT in headers
         },
@@ -182,9 +188,9 @@ toast.info("Coming Soon!!!")
       .then((response) => {
         setTasks(
           tasks.map((task) =>
-            task._id === editedTask._id ? response.data : task
-          )
-        );
+            task.id === editedTask.id ? response.data : task
+        )
+      );
         setUpdateLoading(false);
         setModalIsOpen(false); // Close modal after successful update
         toast.success("Task updated successfully");
@@ -195,15 +201,14 @@ toast.info("Coming Soon!!!")
         setUpdateLoading(false);
       });
   };
-
-  const navigate = useNavigate;
-
+  
+  
   const handleLogout = () => {
     // localStorage.removeItem("token");
     // navigate("/login");
     toast.info("Coming Soon!!!")
   };
-
+  
   if (loading) {
     return (
       <div className="loading-dots ">
@@ -213,11 +218,11 @@ toast.info("Coming Soon!!!")
       </div>
     );
   }
-
+  
   const incompleteTasksCount = tasks.filter((task) => !task.completed).length;
   const completeTasksCount = tasks.filter((task) => task.completed).length;
   const totalTasks = tasks.length;
-
+  
   return (
     <div className="p-10 dark:text-white">
       <div className="text-center flex justify-center gap-5">
@@ -226,7 +231,7 @@ toast.info("Coming Soon!!!")
       </div>
       <div className="flex text-center justify-center">
 
-      <h1 className="mb-10 text-5xl font-bold ">Today's Plan</h1>
+      <h1 className="mb-10 text-5xl font-bold ">Today&apos;s Plan</h1>
       {isDark ? <FiSun className="mt-5 ml-10 cursor-pointer text-2xl" onClick={toggleTheme}/> : <FiMoon className="mt-3 ml-10 cursor-pointer text-2xl" onClick={toggleTheme}/>}
     </div>
        
@@ -245,7 +250,7 @@ toast.info("Coming Soon!!!")
             value={task}
             className="font-bold text-lg h-10 indent-2 border-2 border-collapse rounded-md focus:outline-double outline-blue-400 text-black"
             placeholder="add task ...."
-          />
+            />
         </div>
         <div className="flex justify-start">
           <button className="bg-blue-600 text-white p-2 mt-3 font-bold rounded-md hover:bg-blue-500" id="button" disabled={addloading}>
@@ -264,13 +269,13 @@ toast.info("Coming Soon!!!")
         <button
           className="bg-red-500 px-5 py-2 text-white text-xl font-bold rounded-md ml-20"
           onClick={handleClearCompleted}
-        >
+          >
           Clear Complete
         </button>
         <button
           className="bg-red-500 px-5 text-white text-xl font-bold rounded-md ml-20"
           onClick={handleLogout}
-        >
+          >
           Logout
         </button>
       </div>
@@ -279,32 +284,32 @@ toast.info("Coming Soon!!!")
       ) : (
         tasks.map((task) => (
           <div
-            key={task._id}
-            className="flex justify-between bg-white p-5 mb-1 rounded-md dark:bg-slate-700"
+          key={task._id}
+          className="flex justify-between bg-white p-5 mb-1 rounded-md dark:bg-slate-700"
           >
             <p
               className={`font-bold text-xl ${
                 task.completed ? "line-through" : "line-clamp-none"
-              }`}
-            >
+                }`}
+                >
               {task.title}
             </p>
             <div className="flex gap-10">
               <IoMdCheckmark
-                onClick={() => handleComplete(task._id)}
+                onClick={() => handleComplete(task.id)}
                 className={` font-bold text-xl hover:cursor-pointer ${
                   task.completed ? "text-green-500" : "text-black dark:text-white"
-                }`}
-              />
+                  }`}
+                  />
               <FaDeleteLeft
-                onClick={() => handleDelete(task._id)}
+                onClick={() => handleDelete(task.id)}
                 className="font-bold text-xl hover:cursor-pointer"
-              />
+                />
 
               <MdModeEditOutline
                 onClick={() => handleEdit(task)}
                 className="font-bold text-xl hover:cursor-pointer"
-              />
+                />
             </div>
           </div>
         ))
@@ -314,7 +319,7 @@ toast.info("Coming Soon!!!")
         onRequestClose={() => setModalIsOpen(false)}
         task={selectedTask}
         onSave={handleSaveEdit}
-      />
+        />
       {deleteLoading ? <h1 className="mt-3">Deleting Task...</h1> : ""}
       {completeLoadinng ? <h1 className="mt-3">Completing Task...</h1> : ""}
       {updateLoadinng ? <h1 className="mt-3">Updating Task...</h1> : ""}
@@ -325,5 +330,6 @@ toast.info("Coming Soon!!!")
     </div>
   );
 }
+
 
 export default Home;

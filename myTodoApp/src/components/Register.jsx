@@ -1,10 +1,10 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import axios from 'axios'
 import { Link, useNavigate } from 'react-router-dom'
 import {toast} from 'react-toastify'
 import './login.css'
 const Register = () => {
-    const [userName,setUserName]=useState("")
+    const [user_name,setUserName]=useState("")
     const [email,setEmail]=useState("")
     const [password,setPassword]=useState("")
     const [registerLoading,setRegisterLoading] = useState(false)
@@ -13,7 +13,7 @@ const Register = () => {
     const handleSubmit = async(e)=>{
         setRegisterLoading(true)
         e.preventDefault()
-        axios.post(backendUrl,{userName,email,password})
+        axios.post(backendUrl,{user_name,email,password})
         .then(result=>{
             navigate("/",{replace:true})
             console.log(result)
@@ -34,7 +34,7 @@ const Register = () => {
         <div className='flex flex-col mb-5'>
             <label htmlFor="name" className='font-bold ml-1 mb-2 text-lg text-left'>Name</label>
             <input className='border-2 w-[300px] border-gray-300 h-10 rounded-md focus:outline-none indent-2 text-gray-600 text-md font-bold' type="text" name='name'
-            value={userName}
+            value={user_name}
             onChange={(e)=>setUserName(e.target.value)}
             required/>
         </div>
