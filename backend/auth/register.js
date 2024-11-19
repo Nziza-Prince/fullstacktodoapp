@@ -2,34 +2,35 @@ const { Router } = require("express");
 const router = Router();
 const User = require("../models/usermodel");
 const bcrypt = require("bcrypt");
+const pool = require("../database/databaseConn")
 
 router.post("/", async (req, res) => {
-  const { userName, email, password } = req.body;
-
+  const { user_name, email, password } = req.body;
+  if (!user_name || !email || !password){
+    return res.status(400).json({error: "Missing required fields"})
+  }
   try {
     // Check if the user already exists
-    const existingUser = await User.findOne({ email: email });
-    if (existingUser) {
-      return res.status(400).send("User already exists");
-    }
-
+     const result = await pool.query("select * from users where email = $1",[email])
+     if(result.rows.length > 0){
+      return res.status(400).send("User already ")
+     }
     // Encrypt the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create the new user
-    const newUser = new User({
-      userName: userName,
-      email: email,
-      password: hashedPassword,
-    });
+    const insertQuery = `
+      INSERT INTO users (user_name, email, password)
+      VALUES ($1, $2, $3) RETURNING *;
+    `;
+     
+    const insertValues = [user_name,email,hashedPassword]
+    const insertResult = await pool.query(insertQuery,insertValues)
 
-    // Save the user to the database
-    const result = await newUser.save();
-
-    res.status(201).send(result);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Error creating user");
+    const newUser = insertResult.rows[0]
+    res.status(201).send(newUser)
+  }catch(err){
+    console.error(err)
+    res.status(500).send("Error creating user")
   }
 });
 

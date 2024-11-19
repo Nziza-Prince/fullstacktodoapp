@@ -1,169 +1,143 @@
 const express = require("express");
 const router = express.Router();
-const User = require("./models/usermodel");
+const pool = require("./database/databaseConn");
+
+// GET all users
+router.get("/", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT * FROM users");
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error fetching users" });
+  }
+});
 
 // GET all todos for a specific user
-router.get("/",async(req,res)=>{
-  try{
-   const users = await User.find()
-   res.send(users)
-  }catch(err){
-    console.log(err)
-  }
-})
-
 router.get("/:userId/todos", async (req, res) => {
+  const { userId } = req.params;
   try {
-    const user = await User.findById(req.params.userId);
-    if (!user) {
-      return res.status(404).send("User not found");
+    const result = await pool.query("SELECT * FROM todos WHERE user_id = $1", [userId]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "User or todos not found" });
     }
-    res.send(user.todos);
+    res.json(result.rows);
   } catch (err) {
-    res.status(500).send("Couldn't fetch todos");
+    console.error(err);
+    res.status(500).json({ message: "Couldn't fetch todos" });
   }
 });
 
 // GET a specific todo by ID for a specific user
 router.get("/:userId/todos/:todoId", async (req, res) => {
+  const { userId, todoId } = req.params;
   try {
-    const user = await User.findById(req.params.userId);
-    if (!user) {
-      return res.status(404).send("User not found");
+    const result = await pool.query("SELECT * FROM todos WHERE user_id = $1 AND id = $2", [userId, todoId]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "Todo not found" });
     }
-    const todo = user.todos.id(req.params.todoId);
-    if (!todo) {
-      return res.status(404).send("Todo not found");
-    }
-    res.send(todo);
+    res.json(result.rows[0]);
   } catch (err) {
-    res.status(500).send(err);
+    console.error(err);
+    res.status(500).json({ message: "Couldn't fetch the todo" });
   }
 });
 
 // POST a new todo for a specific user
 router.post("/:userId/todos", async (req, res) => {
+  const { userId } = req.params;
+  const { title, completed = false } = req.body;
+
   try {
-    const user = await User.findById(req.params.userId);
-    if (!user) {
-      return res.status(404).send("User not found");
-    }
-    const newTodo = {
-      title: req.body.title,
-      completed: req.body.completed || false
-    };
-    user.todos.push(newTodo);
-    await user.save();
-    res.send(newTodo);
+    const result = await pool.query(
+      "INSERT INTO todos (user_id, title, completed) VALUES ($1, $2, $3) RETURNING *",
+      [userId, title, completed]
+    );
+    res.status(201).json(result.rows[0]);
   } catch (err) {
-    res.status(500).send(err);
+    console.error(err);
+    res.status(500).json({ message: "Couldn't create the todo" });
   }
 });
 
 // PATCH (update) a specific todo by ID for a specific user
 router.put("/:userId/todos/:todoId", async (req, res) => {
+  const { userId, todoId } = req.params;
+  const { title, completed } = req.body;
+
   try {
-    const user = await User.findById(req.params.userId);
-    if (!user) {
-      return res.status(404).send("User not found");
+    const query = `
+      UPDATE todos
+      SET title = COALESCE($1, title), completed = COALESCE($2, completed)
+      WHERE user_id = $3 AND id = $4
+      RETURNING *`;
+    const result = await pool.query(query, [title, completed, userId, todoId]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "Todo not found" });
     }
-    const todo = user.todos.id(req.params.todoId);
-    if (!todo) {
-      return res.status(404).send("Todo not found");
-    }
-    if (req.body.title != null) {
-      todo.title = req.body.title;
-    }
-    if (req.body.completed != null) {
-      todo.completed = req.body.completed;
-    }
-    await user.save();
-    res.send(todo);
+    res.json(result.rows[0]);
   } catch (err) {
-    res.status(500).send("Something went wrong");
+    console.error(err);
+    res.status(500).json({ message: "Couldn't update the todo" });
   }
 });
 
 // DELETE all completed todos for a specific user
 router.delete("/:userId/todos/status/completed", async (req, res) => {
-  try {
-    const { userId } = req.params;
+  const { userId } = req.params;
 
-    // Find the user and remove all completed todos
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      { $pull: { todos: { completed: true } } }, // Remove completed tasks
-      { new: true } // Return the updated document
+  try {
+    const result = await pool.query(
+      "DELETE FROM todos WHERE user_id = $1 AND completed = TRUE RETURNING *",
+      [userId]
     );
-
-    if (!updatedUser) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    res.status(200).json({ message: "Completed tasks cleared successfully", todos: updatedUser.todos });
-  } catch (err) {
-    res.status(500).json({ message: "Something went wrong", error: err.message });
-  }
-});
-// DELETE a specific todo by ID for a specific user
-router.delete("/:userId/todos/:todoId", async (req, res) => {
-  try {
-    const user = await User.findById(req.params.userId);
-    if (!user) {
-      return res.status(404).send("User not found");
-    }
-    const todo = user.todos.id(req.params.todoId);
-    if (!todo) {
-      return res.status(404).send("Todo not found");
-    }
-    user.todos.pull(todo); // Remove the todo from the array
-    await user.save();
-    res.status(200).send(`Removed ${todo.title} successfully`);
+    res.json({ message: "Completed todos deleted", deleted: result.rows });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Something went wrong", error: err.message });
+    res.status(500).json({ message: "Couldn't delete completed todos" });
   }
 });
 
+// DELETE a specific todo by ID for a specific user
+router.delete("/:userId/todos/:todoId", async (req, res) => {
+  const { userId, todoId } = req.params;
 
- // GET all incomplete todos for a specific user
-router.get("/:userId/todos/status/incomplete", async (req, res) => {
   try {
-    const user = await User.findById(req.params.userId);
-    if (!user) {
-      return res.status(404).send("User not found");
+    const result = await pool.query("DELETE FROM todos WHERE user_id = $1 AND id = $2 RETURNING *", [userId, todoId]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "Todo not found" });
     }
-    const incompleteTodos = user.todos.filter(todo => !todo.completed);
-    res.send(incompleteTodos);
+    res.json({ message: "Todo deleted successfully", deleted: result.rows[0] });
   } catch (err) {
-    res.status(500).send("Couldn't fetch incomplete todos");
+    console.error(err);
+    res.status(500).json({ message: "Couldn't delete the todo" });
   }
 });
 
-router.get("/:userId",async(req,res)=>{
-  try{
-    const user = await User.findById(req.params.userId);
-    if(!user){
-      return res.status(404).send("User not found")
-    
-    }
-    res.send(user.userName)
+// GET all incomplete todos for a specific user
+router.get("/:userId/todos/status/incomplete", async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const result = await pool.query("SELECT * FROM todos WHERE user_id = $1 AND completed = FALSE", [userId]);
+    res.json(result.rows);
   } catch (err) {
-    res.status(500).send("Couldn't get the user");
+    console.error(err);
+    res.status(500).json({ message: "Couldn't fetch incomplete todos" });
   }
-})
+});
 
 // GET all complete todos for a specific user
 router.get("/:userId/todos/status/complete", async (req, res) => {
+  const { userId } = req.params;
+
   try {
-    const user = await User.findById(req.params.userId);
-    if (!user) {
-      return res.status(404).send("User not found");
-    }
-    const completeTodos = user.todos.filter(todo => todo.completed);
-    res.send(completeTodos);
+    const result = await pool.query("SELECT * FROM todos WHERE user_id = $1 AND completed = TRUE", [userId]);
+    res.json(result.rows);
   } catch (err) {
-    res.status(500).send("Couldn't fetch complete todos");
+    console.error(err);
+    res.status(500).json({ message: "Couldn't fetch complete todos" });
   }
 });
 

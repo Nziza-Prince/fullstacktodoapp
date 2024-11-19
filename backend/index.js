@@ -20,15 +20,5 @@ app.use("/register", register);
 app.use("/login", login);
 app.use("/users", todos); // Use the todos routes
 
-// Connecting to MongoDB
-mongoose
-  .connect(mongoUrl)
-  .then(() => console.log("Connected to MongoDB"))
-  .catch((err) => console.error("MongoDB connection error:", err));
-
 // Starting the server
 app.listen(port, () => console.log(`Server running at http://localhost:${port}`));
-
-app.get("/", (req, res) => {
-  res.send("Server is up and running");
-});
