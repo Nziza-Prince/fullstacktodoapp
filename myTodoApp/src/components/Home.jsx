@@ -1,4 +1,4 @@
-import { useEffect, useState, useNavigate, useContext } from "react";
+import { useEffect, useState,useContext } from "react";
 import { FaDeleteLeft } from "react-icons/fa6";
 import { IoMdCheckmark } from "react-icons/io";
 import axios from "axios";
@@ -18,8 +18,8 @@ function Home() {
   const [addloading, setAddLoading] = useState(false);
   const [completeLoadinng, setCompleteLoading] = useState(false);
   const [updateLoadinng, setUpdateLoading] = useState(false);
-  const [clearLoadinng, setClearLoading] = useState(false);
-  const [dark, setDark] = useState(true);
+  // const [clearLoadinng, setClearLoading] = useState(false);
+  // const [dark, setDark] = useState(true);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
