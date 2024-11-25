@@ -5,6 +5,7 @@ import Home from './components/Home.jsx'
 import { Routes,Route,BrowserRouter } from 'react-router-dom'
 import Logout from './components/Logout.jsx'
 import Notification from './components/Notification.jsx'
+import PrivateRoute from './components/PrivateRoute.jsx'
 
 function App() {
   return (
@@ -13,9 +14,9 @@ function App() {
      <Routes>
       <Route path="/" element={<Login/>}/>
       <Route path="/register" element={<Register/>}/>
-      <Route path="/home" element={<Home/>}/>
+      <Route path="/home" element={<PrivateRoute><Home /></PrivateRoute>} />
       <Route path="/logout" element={<Logout/>}/>
-
+      
     </Routes>
     <Notification/>
    </BrowserRouter>

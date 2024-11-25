@@ -10,7 +10,9 @@ import { toast } from "react-toastify";
 import { FiSun } from "react-icons/fi";
 import { FiMoon } from "react-icons/fi";
 import { ThemeContext } from "../store/ThemeContext";
-import User from "./User";
+import { useNavigate } from 'react-router-dom'
+
+// import User from "./User";
 function Home() {
   const [task, setTask] = useState("");
   const [tasks, setTasks] = useState([]);
@@ -30,7 +32,7 @@ function Home() {
   const userId = decodedToken?.userId; // Extract userId from token
   const backendUrl = `${import.meta.env.VITE_UBASE_URL}/${userId}/todos`; // Default URL for development
 
-  // const navigate = useNavigate()
+  const navigate = useNavigate()
 
 
     useEffect(() => {
@@ -59,7 +61,7 @@ function Home() {
       })
       .catch((error) => {
         setLoading(false);
-        setError("Failed to fetch tasks. Please check your connection or try again.");
+        // setError("Failed to fetch tasks. Please check your connection or try again.");
         console.error("Couldn't fetch the tasks", error.response || error.message);
       });
     }, [backendUrl, token]);
@@ -115,15 +117,14 @@ function Home() {
         setDeleteLoading(false);
       });
   };
-
   const handleClearCompleted = () => {
-//      const completedTasks = tasks.filter((task)=>task.completed)
-
-//      if(completedTasks.length === 0){
-  //       toast.info("You have no completed tasks")
-  //      }
-  // else{
+    //      const completedTasks = tasks.filter((task)=>task.completed)
     
+    //      if(completedTasks.length === 0){
+      //       toast.info("You have no completed tasks")
+      //      }
+      // else{
+        
   //   setClearLoading(true)
   //   axios
   //     .delete(`${backendUrl}/clear-completed`, {
@@ -162,25 +163,25 @@ function Home() {
       .then((response) => {
         setTasks(tasks.map((task) => (task.id === id ? response.data : task)));
         setCompleteLoading(false);
-      
+        
       })
       .catch((error) => {
         console.error("There was an error updating the task!", error);
         toast.error("couldnt update the task! Try refreshing the page");
         setCompleteLoading(false);
       });
-    
+      
     };
     
     const handleEdit = (task) => {
       setSelectedTask(task);
       setModalIsOpen(true);
-  };
-  
-  const handleSaveEdit = (editedTask) => {
-    setUpdateLoading(true);
-    axios
-    .put(`${backendUrl}/${editedTask.id}`, editedTask, {
+    };
+    
+    const handleSaveEdit = (editedTask) => {
+      setUpdateLoading(true);
+      axios
+      .put(`${backendUrl}/${editedTask.id}`, editedTask, {
         headers: {
           Authorization: `Bearer ${token}`, // Include JWT in headers
         },
@@ -191,7 +192,7 @@ function Home() {
             task.id === editedTask.id ? response.data : task
         )
       );
-        setUpdateLoading(false);
+      setUpdateLoading(false);
         setModalIsOpen(false); // Close modal after successful update
         toast.success("Task updated successfully");
       })
@@ -200,17 +201,18 @@ function Home() {
         toast.error("Failed to update the task! Try to refresh the page");
         setUpdateLoading(false);
       });
+    };
+  
+    const handleLogout = () => {
+      localStorage.removeItem("token");
+      navigate("/", { replace: true });
+      window.location.reload(); // Clear any cached data
   };
   
-  
-  const handleLogout = () => {
-    // localStorage.removeItem("token");
-    // navigate("/login");
-    toast.info("Coming Soon!!!")
-  };
-  
-  if (loading) {
-    return (
+
+    
+    if (loading) {
+      return (
       <div className="loading-dots ">
         <div className="dark:bg-white"></div>
         <div className="dark:bg-white"></div>
@@ -226,12 +228,12 @@ function Home() {
   return (
     <div className="p-10 dark:text-white">
       <div className="text-center flex justify-center gap-5">
-       <h1 className="mb-10 text-5xl font-bold text-center">Welcome</h1>
-      <User/>
+       {/* <h1 className="mb-10 text-5xl font-bold text-center">Welcome</h1>
+      <User/> */}
       </div>
       <div className="flex text-center justify-center">
 
-      <h1 className="mb-10 text-5xl font-bold ">Today&apos;s Plan</h1>
+      <h1 className="mb-10 text-5xl font-bold ">Everyday&apos;s Plan</h1>
       {isDark ? <FiSun className="mt-5 ml-10 cursor-pointer text-2xl" onClick={toggleTheme}/> : <FiMoon className="mt-3 ml-10 cursor-pointer text-2xl" onClick={toggleTheme}/>}
     </div>
        
@@ -323,7 +325,7 @@ function Home() {
       {deleteLoading ? <h1 className="mt-3">Deleting Task...</h1> : ""}
       {completeLoadinng ? <h1 className="mt-3">Completing Task...</h1> : ""}
       {updateLoadinng ? <h1 className="mt-3">Updating Task...</h1> : ""}
-      {clearLoadinng ? <h1 className="mt-3">Clearing Tasks...</h1>:""}
+      {/* {clearLoadinng ? <h1 className="mt-3">Clearing Tasks...</h1>:""} */}
 
       <hr className="mt-10 " />
       <p className="font-bold mt-3">© Nziza Prince 2024</p>
