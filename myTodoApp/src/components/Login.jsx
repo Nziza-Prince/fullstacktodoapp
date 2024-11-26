@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import './login.css';
+import { FaRegEye } from "react-icons/fa6";
+import { FaRegEyeSlash } from "react-icons/fa6";
 
 const Login = () => {
     const [loading, setLoading] = useState(false);
@@ -10,7 +12,7 @@ const Login = () => {
     const [password, setPassword] = useState("");
     const backendUrl = import.meta.env.VITE_LOGIN_URL;
     const navigate = useNavigate();
-
+    const [showPassword,setShowPassword] = useState(false)
     useEffect(() => {
         // Redirect to /home if the token exists
         const token = localStorage.getItem("token");
@@ -38,6 +40,7 @@ const Login = () => {
             setLoading(false);
         }
     };
+    
 
     return (
         <div className='flex justify-center align-middle p-20'>
@@ -55,16 +58,25 @@ const Login = () => {
                     />
                 </div>
                 <div className='flex flex-col mb-5'>
-                    <label htmlFor="password" className='font-bold ml-1 mb-2 text-lg text-left'>Password</label>
-                    <input
-                        className='border-2 w-[300px] border-gray-300 h-10 rounded-md focus:outline-none indent-2 text-gray-600 text-md font-bold'
-                        type="password"
-                        name='password'
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                    />
-                </div>
+        <label htmlFor="password" className='font-bold ml-1 mb-2 text-lg text-left'>Password</label>
+        <div className="relative">
+            <input
+                className='border-2 w-[300px] border-gray-300 h-10 rounded-md focus:outline-none indent-2 text-gray-600 text-md font-bold'
+                type={showPassword ? "text" : "password"}
+                name='password'
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+            />
+            <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+            >
+                {showPassword ? <FaRegEyeSlash /> : <FaRegEye />}
+            </button>
+        </div>
+    </div>
                 <button
                     type="submit"
                     disabled={loading}
