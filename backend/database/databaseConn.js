@@ -1,7 +1,4 @@
 const { Pool } = require('pg');
-const fs = require('fs')
-
-const caCertificate = fs.readFileSync('/home/nziza/Documents/code/fullstacktodoapp/backend/aiven-ca.pem').toString()
 const pool = new Pool({
    user:"postgres",
    host:"localhost",
