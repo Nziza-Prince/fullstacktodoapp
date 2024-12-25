@@ -1,6 +1,6 @@
 const { Router } = require("express");
 const router = Router();
-const User = require("../models/usermodel");
+
 const bcrypt = require("bcrypt");
 const pool = require("../database/databaseConn")
 

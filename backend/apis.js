@@ -141,4 +141,14 @@ router.get("/:userId/todos/status/complete", async (req, res) => {
   }
 });
 
+router.patch("/:userId/todos/status/un-complete-all",async(req,res) => {
+  const {userId} = req.params
+  try{
+    const result = await pool.query("update todos set completed = false where user_id = $1 and completed = true returning *",[userId])
+    res.json({message:"All todos marked as incomplete",update:result.rows})
+  }catch(err){
+    console.error(err.getMessage())
+    res.status(500).json({message:"Couldnt update the status"})
+  }
+})
 module.exports = router;
