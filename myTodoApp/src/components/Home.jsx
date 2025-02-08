@@ -11,6 +11,7 @@ import { FiSun } from "react-icons/fi";
 import { FiMoon } from "react-icons/fi";
 import { ThemeContext } from "../store/ThemeContext";
 import { useNavigate } from 'react-router-dom'
+import UncompleteAll from "./UncompleteAll";
 
 // import User from "./User";
 function Home() {
@@ -117,35 +118,7 @@ function Home() {
         setDeleteLoading(false);
       });
   };
-  const handleClearCompleted = () => {
-    //      const completedTasks = tasks.filter((task)=>task.completed)
-    
-    //      if(completedTasks.length === 0){
-      //       toast.info("You have no completed tasks")
-      //      }
-      // else{
-        
-  //   setClearLoading(true)
-  //   axios
-  //     .delete(`${backendUrl}/clear-completed`, {
-    //       headers: {
-      //         Authorization: `Bearer ${token}`, // Include JWT in headers
-      //       },
-      //     })
-      //     .then(() => {
-        //       setTasks(tasks.filter((task) => !task.completed));
-        //       toast.success("Cleared tasks Successfully")
-        //       setClearLoading(false)
-        //     })
-        //     .catch((error) => {
-          //       console.error("Error clearing completed tasks", error);
-          //       toast.error("Refresh the page and try again");
-          //       setClearLoading(false)
-          //     });
-          // }
-          toast.info("Coming Soon!!!")
-        };
-        
+
         const handleComplete = (id) => {
           setCompleteLoading(true);
           
@@ -209,6 +182,23 @@ function Home() {
       window.location.reload(); // Clear any cached data
   };
   
+  const refreshTodos = () => {
+    setLoading(true);
+    axios
+      .get(`${backendUrl}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        setTasks(res.data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        setLoading(false);
+        console.error("Couldn't fetch the tasks", error.response || error.message);
+      });
+  };
 
     
     if (loading) {
@@ -260,27 +250,25 @@ function Home() {
           </button>
         </div>
       </form>
-      <div className="text-right  flex  mb-10 justify-between">
-        <p className="font-bold text-2xl">
-          Incomplete Tasks: {incompleteTasksCount}
-        </p>
-        <p className="font-bold text-2xl">
-          Complete Tasks: {completeTasksCount}
-        </p>
-        <p className="font-bold text-2xl">Total Tasks: {totalTasks}</p>
+      <div className="text-right flex mb-10 justify-between items-center">
+      <p className="font-bold text-2xl">
+        Incomplete Tasks: {incompleteTasksCount}
+      </p>
+      <p className="font-bold text-2xl">
+        Complete Tasks: {completeTasksCount}
+      </p>
+      <p className="font-bold text-2xl">Total Tasks: {totalTasks}</p>
+      
+      <div className="flex gap-4">
+        <UncompleteAll refreshTodos={refreshTodos} />
         <button
-          className="bg-red-500 px-5 py-2 text-white text-xl font-bold rounded-md ml-20"
-          onClick={handleClearCompleted}
-          >
-          Clear Complete
-        </button>
-        <button
-          className="bg-red-500 px-5 text-white text-xl font-bold rounded-md ml-20"
+          className="bg-red-500 px-5 text-white text-xl font-bold rounded-md"
           onClick={handleLogout}
-          >
+        >
           Logout
         </button>
       </div>
+    </div>
       {tasks.length === 0 ? (
         <p className="font-bold text-lg">No Tasks to display</p>
       ) : (
